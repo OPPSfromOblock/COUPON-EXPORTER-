@@ -24,84 +24,149 @@
 
     <style>
         :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #334a6d;
-            --success-color: #5cb85c;
-            --danger-color: #d9534f;
-            --warning-color: #f0ad4e;
-            --info-color: #5bc0de;
-            --light-bg: #f0f2f5;
-            --dark-bg: #2c3e50;
-            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-            --gradient-start: #e0f2f7;
-            --gradient-end: #f0f8ff;
+            --primary-color: #4a90e2; /* A vibrant blue */
+            --secondary-color: #334a6d; /* Darker blue for contrast */
+            --success-color: #5cb85c; /* Green for success actions */
+            --danger-color: #d9534f; /* Red for errors/warnings */
+            --warning-color: #f0ad4e; /* Orange for warnings */
+            --info-color: #5bc0de; /* Light blue for info messages */
+            --light-bg: #f0f2f5; /* Light grey background */
+            --dark-bg: #2c3e50; /* Dark background for potential dark mode */
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Deeper shadow for cards */
+            --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+            --gradient-start: #e0f2f7; /* Light gradient start */
+            --gradient-end: #f0f8ff; /* Light gradient end */
+
+            /* New Genshin-like colors */
+            --genshin-primary: #4a6b9c; /* A muted blue */
+            --genshin-secondary: #7a92b8; /* Lighter blue */
+            --genshin-accent: #e6b34c; /* Gold/Orange accent */
+            --genshin-text: #333;
+            --genshin-bg-start: #cce0ff; /* Very light blue */
+            --genshin-bg-end: #e0f2ff; /* Slightly darker light blue */
         }
 
         body {
-            background-color: var(--light-bg);
+            background: linear-gradient(135deg, var(--genshin-bg-start), var(--genshin-bg-end), var(--genshin-bg-start));
+            background-size: 400% 400%;
+            animation: gradientAnimation 20s ease infinite; /* Slower, smoother animation */
             font-family: 'Poppins', sans-serif;
-            color: #333;
+            color: var(--genshin-text);
             padding: 20px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container-coupon-exporter {
             max-width: 1200px;
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
             box-shadow: var(--card-shadow);
-            padding: 30px;
+            padding: 40px;
             margin-top: 20px;
+            margin-bottom: 20px;
+            position: relative; /* For potential future layering */
+            z-index: 1; /* Ensure content is above background */
         }
 
         h1 {
-            color: var(--primary-color);
+            color: var(--genshin-primary);
             font-weight: 700;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             text-align: center;
+            text-shadow: var(--text-shadow);
         }
 
         .card {
-            border: 1px solid #e0e0e0;
+            border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            overflow: hidden;
         }
 
         .card-header {
-            background-color: var(--primary-color);
+            background-color: var(--genshin-primary);
             color: white;
             font-weight: 600;
             border-radius: 12px 12px 0 0 !important;
-            padding: 15px 20px;
-            font-size: 1.1rem;
+            padding: 18px 25px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-control, .form-select {
-            border-radius: 6px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 12px;
             border: 1px solid #ced4da;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--genshin-primary);
+            box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
         }
 
         .btn {
             font-weight: 600;
             border-radius: 8px;
-            padding: 10px 20px;
-            transition: all 0.2s ease-in-out;
+            padding: 12px 25px;
+            transition: all 0.3s ease-in-out, transform 0.1s ease-out; /* Added transform for hit effect */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative; /* For pseudo-element glow */
+            overflow: hidden; /* Hide overflow for glow */
+        }
+
+        .btn:active {
+            transform: scale(0.98); /* "Hit" effect */
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3); /* Light glow */
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+            z-index: 0;
+        }
+
+        .btn:active::before {
+            width: 200%;
+            height: 200%;
+            opacity: 1;
+            transition: 0s; /* Instant glow on click */
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background-color: var(--genshin-primary);
+            border-color: var(--genshin-primary);
         }
         .btn-primary:hover {
-            background-color: #3a7bd5;
-            border-color: #3a7bd5;
+            background-color: var(--genshin-secondary);
+            border-color: var(--genshin-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .btn-success {
             background-color: var(--success-color);
@@ -110,6 +175,8 @@
         .btn-success:hover {
             background-color: #4cae4c;
             border-color: #4cae4c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .btn-info {
             background-color: var(--info-color);
@@ -118,14 +185,56 @@
         .btn-info:hover {
             background-color: #46b8da;
             border-color: #46b8da;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background-color: #e69500;
+            border-color: #e69500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-outline-primary {
+            border-color: var(--genshin-primary);
+            color: var(--genshin-primary);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--genshin-primary);
+            color: white;
+        }
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        #couponCanvasContainer {
+            width: 100%;
+            height: 400px; /* Fixed height for the container */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            overflow: hidden; /* Ensure canvas doesn't overflow */
         }
 
         #couponCanvas {
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            margin-top: 20px;
+            display: block; /* Remove extra space below canvas */
             max-width: 100%;
-            height: auto; /* Maintain aspect ratio */
+            max-height: 100%;
+            object-fit: contain; /* Scale image down to fit container */
         }
 
         .loading-overlay {
@@ -134,46 +243,75 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(0,0,0,0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
             display: none;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .spinner-border {
-            width: 3rem;
-            height: 3rem;
+            width: 4rem;
+            height: 4rem;
             color: white;
+            border-width: 0.4em;
+        }
+        .loading-overlay span {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
         }
 
         .list-group-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1.25rem;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-bottom: 1px solid #eee;
+            background-color: #fdfdfd;
+            transition: background-color 0.2s ease;
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        .list-group-item:hover {
+            background-color: #f5f5f5;
         }
         .list-group-item label {
             margin-bottom: 0;
             cursor: pointer;
+            flex-grow: 1;
+            font-size: 0.95rem;
         }
         .list-group-item input[type="checkbox"] {
-            margin-right: 10px;
+            margin-right: 12px;
+            transform: scale(1.2);
         }
 
         .generated-coupon-preview {
-            border: 1px solid #eee;
-            padding: 10px;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
             margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             text-align: center;
+            background-color: #ffffff;
         }
         .generated-coupon-preview img {
             max-width: 100%;
             height: auto;
             display: block;
             margin: 0 auto;
+            border-radius: 6px;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 0.95rem;
         }
     </style>
 </head>
@@ -182,6 +320,7 @@
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+        <span id="loadingText">Loading...</span>
     </div>
 
     <div class="container-coupon-exporter">
@@ -195,7 +334,7 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="couponStudentSearch" placeholder="Search students...">
+                            <input type="text" class="form-control" id="couponStudentSearch" placeholder="Search students by name or ID...">
                         </div>
                         <div class="d-flex justify-content-between mb-3">
                             <button class="btn btn-sm btn-outline-primary" id="selectAllStudentsBtn"><i class="fas fa-check-double"></i> Select All</button>
@@ -223,6 +362,11 @@
                             <label for="templateUpload" class="form-label">Upload PNG Template</label>
                             <input class="form-control" type="file" id="templateUpload" accept="image/png">
                         </div>
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn btn-sm btn-outline-primary" id="saveTemplateBtn"><i class="fas fa-save"></i> Save Template</button>
+                            <input type="file" id="loadTemplateInput" style="display:none;" accept=".json">
+                            <button class="btn btn-sm btn-outline-secondary" id="loadTemplateBtn"><i class="fas fa-folder-open"></i> Load Template</button>
+                        </div>
                         <div class="alert alert-info" id="templateInfo" style="display: none;">
                             Template loaded. Use the fields below to add dynamic text.
                         </div>
@@ -239,6 +383,7 @@
                             <select class="form-select" id="placeholderType">
                                 <option value="">Select a placeholder</option>
                                 <option value="name">Student Name</option>
+                                <option value="id">Student ID</option>
                                 <option value="grade">Student Grade</option>
                                 <option value="expiry">Expiry Date</option>
                             </select>
@@ -249,23 +394,24 @@
                             <label for="expiryDate" class="form-label">Set Expiry Date</label>
                             <input type="date" class="form-control" id="expiryDate">
                         </div>
+                        <div class="mb-3">
+                            <label for="dateFormat" class="form-label">Date Format</label>
+                            <select class="form-select" id="dateFormat">
+                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                <option value="MM-DD-YYYY">MM-DD-YYYY</option>
+                                <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+                            </select>
+                        </div>
 
                         <hr>
-                        <h5>Feature Checkboxes (Text on Canvas)</h5>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="featureVision" value="Vision">
-                            <label class="form-check-label" for="featureVision">Vision</label>
-                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Vision"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="featureCanteen" value="Canteen">
-                            <label class="form-check-label" for="featureCanteen">Canteen</label>
-                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Canteen"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="featureVideoCall" value="Video Call">
-                            <label class="form-check-label" for="featureVideoCall">Video Call</label>
-                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Video Call"><i class="fas fa-plus"></i> Add</button>
+                        <h5>Add Features to Canvas</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-secondary add-feature-btn" data-feature="Vision"><i class="fas fa-plus"></i> Vision</button>
+                            <button class="btn btn-sm btn-outline-secondary add-feature-btn" data-feature="Canteen"><i class="fas fa-plus"></i> Canteen</button>
+                            <button class="btn btn-sm btn-outline-secondary add-feature-btn" data-feature="Video Call"><i class="fas fa-plus"></i> Video Call</button>
+                            <!-- Add more feature buttons as needed -->
                         </div>
 
                         <hr>
@@ -283,8 +429,10 @@
                         <i class="fas fa-paint-brush"></i> Coupon Design Canvas
                     </div>
                     <div class="card-body text-center">
-                        <canvas id="couponCanvas"></canvas>
-                        <small class="text-muted mt-2 d-block">Drag and resize text fields on the canvas.</small>
+                        <div id="couponCanvasContainer">
+                            <canvas id="couponCanvas"></canvas>
+                        </div>
+                        <small class="text-muted mt-2 d-block">Drag and resize text fields on the canvas to position them correctly.</small>
                     </div>
                 </div>
 
@@ -349,11 +497,17 @@
         let students = [];
         let canvas = null;
         let templateImage = null;
-        let originalCanvasState = null; // To store the state after template and initial placeholders are added
+        let originalCanvasState = null;
+        let currentEditorCanvasState = null;
 
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        const couponCanvasContainer = document.getElementById('couponCanvasContainer');
 
-        function showLoading() { loadingOverlay.style.display = 'flex'; }
+        function showLoading(message = 'Loading...') {
+            loadingText.textContent = message;
+            loadingOverlay.style.display = 'flex';
+        }
         function hideLoading() { loadingOverlay.style.display = 'none'; }
 
         function displayMessage(elementId, message, type = 'success') {
@@ -368,7 +522,7 @@
 
         // --- Student Selector Logic ---
         async function loadStudentsFromFirebase() {
-            showLoading();
+            showLoading('Loading students...');
             const listContainer = document.getElementById('couponStudentList');
             const loadingDiv = document.getElementById('couponStudentLoading');
             const errorDiv = document.getElementById('couponStudentError');
@@ -387,7 +541,6 @@
                 const data = snapshot.val();
                 students = Array.isArray(data) ? data : Object.values(data);
 
-                // Sort students alphabetically by name
                 const sortedStudents = [...students].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
                 sortedStudents.forEach(student => {
@@ -422,51 +575,134 @@
 
         // --- Canvas and Fabric.js Logic ---
         function initCanvas() {
+            const containerWidth = couponCanvasContainer.clientWidth;
+            const containerHeight = couponCanvasContainer.clientHeight;
+
             canvas = new fabric.Canvas('couponCanvas', {
                 backgroundColor: '#f9f9f9',
-                selection: true, // Enable selection of objects
-                preserveObjectStacking: true // Keep objects in their z-index order
+                selection: true,
+                preserveObjectStacking: true,
+                width: containerWidth,
+                height: containerHeight
             });
 
-            // Set initial dimensions (can be adjusted based on common template sizes)
-            canvas.setDimensions({ width: 600, height: 300 });
+            canvas.on('object:modified', function() {
+                currentEditorCanvasState = canvas.toJSON();
+            });
+            canvas.on('object:added', function() {
+                currentEditorCanvasState = canvas.toJSON();
+            });
+            canvas.on('object:removed', function() {
+                currentEditorCanvasState = canvas.toJSON();
+            });
 
-            // Event listener for object selection
-            canvas.on('selection:created', function(e) {
-                if (e.target) {
-                    console.log('Object selected:', e.target);
+            // Handle canvas resize if container changes
+            new ResizeObserver(() => {
+                const newWidth = couponCanvasContainer.clientWidth;
+                const newHeight = couponCanvasContainer.clientHeight;
+                if (canvas.getWidth() !== newWidth || canvas.getHeight() !== newHeight) {
+                    canvas.setDimensions({ width: newWidth, height: newHeight });
+                    if (templateImage) {
+                        // Rescale background image to fit new canvas size
+                        templateImage.scaleToWidth(canvas.getWidth());
+                        canvas.setBackgroundImage(templateImage, canvas.renderAll.bind(canvas));
+                    }
+                    canvas.renderAll();
                 }
-            });
-            canvas.on('selection:updated', function(e) {
-                if (e.target) {
-                    console.log('Object selected:', e.target);
-                }
-            });
+            }).observe(couponCanvasContainer);
         }
 
         function loadTemplateImage(event) {
             const file = event.target.files[0];
             if (!file) return;
 
+            showLoading('Loading template...');
             const reader = new FileReader();
             reader.onload = function(e) {
                 const imgUrl = e.target.result;
                 fabric.Image.fromURL(imgUrl, function(img) {
                     templateImage = img;
-                    // Scale image to fit canvas width, maintaining aspect ratio
-                    img.scaleToWidth(canvas.getWidth());
-                    canvas.setHeight(img.getScaledHeight()); // Adjust canvas height to image height
 
-                    canvas.clear(); // Clear previous content
-                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                    // Calculate scale to fit image within canvas container while maintaining aspect ratio
+                    const containerWidth = couponCanvasContainer.clientWidth;
+                    const containerHeight = couponCanvasContainer.clientHeight;
+
+                    const scaleX = containerWidth / img.width;
+                    const scaleY = containerHeight / img.height;
+                    const scale = Math.min(scaleX, scaleY);
+
+                    img.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                        originX: 'left',
+                        originY: 'top',
+                        left: 0,
+                        top: 0
+                    });
+
+                    canvas.clear();
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                        scaleX: scale,
+                        scaleY: scale,
+                        originX: 'left',
+                        originY: 'top',
+                        left: 0,
+                        top: 0
+                    });
                     canvas.renderAll();
 
                     document.getElementById('templateInfo').style.display = 'block';
-                    originalCanvasState = canvas.toJSON(); // Save initial state
-                }, { crossOrigin: 'anonymous' }); // Important for toDataURL later
+                    originalCanvasState = canvas.toJSON();
+                    currentEditorCanvasState = canvas.toJSON();
+                    hideLoading();
+                }, { crossOrigin: 'anonymous' });
             };
             reader.readAsDataURL(file);
         }
+
+        function saveCanvasTemplate() {
+            if (!canvas || !currentEditorCanvasState) {
+                displayMessage('exportError', 'No template to save. Please load an image first.', 'danger');
+                return;
+            }
+            const json = JSON.stringify(currentEditorCanvasState);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'coupon_template.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            displayMessage('templateInfo', 'Template saved successfully!', 'success');
+        }
+
+        function loadCanvasTemplate(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoading('Loading template...');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const json = e.target.result;
+                canvas.loadFromJSON(json, function() {
+                    canvas.renderAll();
+                    // Re-set templateImage if it was part of the saved state
+                    const bgImage = canvas.backgroundImage;
+                    if (bgImage && bgImage.type === 'image') {
+                        templateImage = bgImage;
+                    } else {
+                        templateImage = null; // Clear if no background image in loaded template
+                    }
+                    currentEditorCanvasState = canvas.toJSON();
+                    displayMessage('templateInfo', 'Template loaded successfully!', 'success');
+                    hideLoading();
+                });
+            };
+            reader.readAsText(file);
+        }
+
 
         function addPlaceholder(type) {
             if (!canvas || !templateImage) {
@@ -477,45 +713,63 @@
             let text = '';
             let fontSize = 20;
             let fontWeight = 'normal';
-            let fill = '#000000'; // Default text color
+            let fill = '#000000';
+            let initialLeft = 50;
+            let initialTop = 50 + (canvas.getObjects().length * 5);
 
             switch (type) {
                 case 'name':
                     text = '{STUDENT_NAME}';
-                    fontSize = 24;
+                    fontSize = 40;
                     fontWeight = 'bold';
-                    fill = '#00008B'; // Dark Blue
+                    fill = '#00008B';
+                    initialLeft = canvas.getWidth() * 0.1;
+                    initialTop = canvas.getHeight() * 0.2;
+                    break;
+                case 'id':
+                    text = '{STUDENT_ID}';
+                    fontSize = 32;
+                    fontWeight = 'bold';
+                    fill = '#4B0082';
+                    initialLeft = canvas.getWidth() * 0.1;
+                    initialTop = canvas.getHeight() * 0.3;
                     break;
                 case 'grade':
                     text = '{STUDENT_GRADE}';
-                    fontSize = 22;
+                    fontSize = 36;
                     fontWeight = 'bold';
-                    fill = '#228B22'; // Forest Green
+                    fill = '#228B22';
+                    initialLeft = canvas.getWidth() * 0.1;
+                    initialTop = canvas.getHeight() * 0.4;
                     break;
                 case 'expiry':
                     text = '{EXPIRY_DATE}';
-                    fontSize = 18;
-                    fill = '#8B0000'; // Dark Red
+                    fontSize = 30;
+                    fontWeight = 'bold';
+                    fill = '#8B0000';
+                    initialLeft = canvas.getWidth() * 0.1;
+                    initialTop = canvas.getHeight() * 0.5;
                     break;
                 default:
                     return;
             }
 
             const textObject = new fabric.IText(text, {
-                left: 50,
-                top: 50,
+                left: initialLeft,
+                top: initialTop,
                 fontFamily: 'Poppins',
                 fontSize: fontSize,
                 fontWeight: fontWeight,
                 fill: fill,
-                hasControls: true, // Allow resizing and rotating
+                hasControls: true,
                 hasBorders: true,
                 selectable: true,
-                name: type // Custom property to identify placeholder type
+                name: type // Store the type for later replacement
             });
             canvas.add(textObject);
-            canvas.setActiveObject(textObject); // Select the newly added object
+            canvas.setActiveObject(textObject);
             canvas.renderAll();
+            currentEditorCanvasState = canvas.toJSON();
         }
 
         function addFeatureText(feature) {
@@ -525,19 +779,20 @@
             }
 
             const textObject = new fabric.IText(feature, {
-                left: 50,
-                top: 100 + (canvas.getObjects().length * 10), // Offset to avoid overlapping
+                left: canvas.getWidth() * 0.6, // Example: 60% from left
+                top: 100 + (canvas.getObjects().length * 10),
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 18,
                 fill: '#333333',
                 hasControls: true,
                 hasBorders: true,
                 selectable: true,
-                name: `feature_${feature.replace(/\s/g, '')}` // Unique name for feature text
+                name: `feature_${feature.replace(/\s/g, '')}`
             });
             canvas.add(textObject);
             canvas.setActiveObject(textObject);
             canvas.renderAll();
+            currentEditorCanvasState = canvas.toJSON();
         }
 
         // --- OCR Cleanup (Optional) ---
@@ -547,38 +802,79 @@
                 return;
             }
             displayMessage('ocrStatus', 'Detecting text with OCR... This may take a moment.', 'info');
-            showLoading();
+            showLoading('Detecting text...');
 
             try {
-                // Get the image data from the canvas
+                // Temporarily remove existing text objects and OCR cover areas for clean OCR scan
+                const originalObjects = canvas.getObjects().filter(obj => obj.type === 'i-text' || obj.type === 'text' || obj.name === 'ocr_cover_area');
+                canvas.remove(...originalObjects);
+                canvas.renderAll();
+
                 const imageDataUrl = canvas.toDataURL({
                     format: 'png',
                     quality: 1
                 });
 
+                // Add back original objects after capturing image for OCR
+                originalObjects.forEach(obj => canvas.add(obj));
+                canvas.renderAll();
+
                 const { data: { text, words } } = await Tesseract.recognize(
                     imageDataUrl,
-                    'eng', // English language
+                    'eng',
                     {
-                        logger: m => console.log(m) // Log progress
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                loadingText.textContent = `OCR: ${Math.round(m.progress * 100)}%`;
+                            } else {
+                                loadingText.textContent = `OCR: ${m.status}`;
+                            }
+                        }
                     }
                 );
 
                 console.log('OCR Result:', text);
                 console.log('Detected Words:', words);
 
-                if (words && words.length > 0) {
-                    displayMessage('ocrStatus', `OCR detected text: "${text.substring(0, 50)}..."`, 'success');
-                    document.getElementById('ocrCoverBtn').style.display = 'inline-block';
+                // Remove previous OCR bounding boxes
+                canvas.remove(...canvas.getObjects().filter(obj => obj.name === 'ocr_bbox'));
 
-                    // Add bounding boxes for detected words (optional, for visualization)
+                if (words && words.length > 0) {
+                    displayMessage('ocrStatus', `OCR detected text: "${text.substring(0, Math.min(text.length, 50))}..."`, 'success');
+                    document.getElementById('ocrCoverBtn').style.display = 'inline-flex';
+
+                    let dateDetected = false;
                     words.forEach(word => {
+                        // Simple heuristic for date detection: look for common date patterns or keywords
+                        const lowerText = word.text.toLowerCase();
+                        const isDateKeyword = lowerText.includes('date') || lowerText.includes('expiry') || lowerText.includes('valid');
+                        const looksLikeDate = /\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}/.test(word.text); // e.g., 01/01/2023
+
+                        if ((isDateKeyword || looksLikeDate) && !dateDetected) {
+                            // Add expiry date placeholder near the detected date box
+                            const textObject = new fabric.IText('{EXPIRY_DATE}', {
+                                left: word.bbox.x,
+                                top: word.bbox.y + word.bbox.height + 5, // Position below detected text
+                                fontFamily: 'Poppins',
+                                fontSize: 20,
+                                fill: '#8B0000',
+                                hasControls: true,
+                                hasBorders: true,
+                                selectable: true,
+                                name: 'expiry'
+                            });
+                            canvas.add(textObject);
+                            canvas.setActiveObject(textObject);
+                            displayMessage('ocrStatus', 'Detected a potential date field. An {EXPIRY_DATE} placeholder has been added.', 'info');
+                            dateDetected = true;
+                        }
+
                         const rect = new fabric.Rect({
                             left: word.bbox.x,
                             top: word.bbox.y,
                             width: word.bbox.width,
                             height: word.bbox.height,
-                            fill: 'rgba(255,0,0,0.2)', // Semi-transparent red
+                            fill: 'rgba(255,0,0,0.2)',
                             stroke: 'red',
                             strokeWidth: 1,
                             selectable: false,
@@ -597,30 +893,31 @@
                 displayMessage('ocrStatus', 'Error during OCR detection: ' + error.message, 'danger');
             } finally {
                 hideLoading();
+                currentEditorCanvasState = canvas.toJSON();
             }
         }
 
         function coverDetectedArea() {
-            // Remove existing OCR bounding boxes
             canvas.remove(...canvas.getObjects().filter(obj => obj.name === 'ocr_bbox'));
 
-            // For simplicity, this function will just add a white rectangle.
-            // In a real scenario, you'd use the OCR bounding boxes to create specific cover rectangles.
-            // Or, if you want to cover a specific "name" area, you'd define its coordinates.
             const coverRect = new fabric.Rect({
-                left: 10, // Example coordinates, adjust as needed
-                top: 10,
+                left: 50,
+                top: 50,
                 width: 200,
                 height: 50,
-                fill: 'white', // Or the background color of your template
+                fill: 'white',
                 selectable: true,
                 hasControls: true,
-                name: 'ocr_cover_area'
+                name: 'ocr_cover_area',
+                stroke: '#ccc',
+                strokeWidth: 1
             });
             canvas.add(coverRect);
+            canvas.setActiveObject(coverRect);
             canvas.renderAll();
-            displayMessage('ocrStatus', 'A white rectangle has been added. Position it to cover unwanted text.', 'info');
-            document.getElementById('ocrCoverBtn').style.display = 'none'; // Hide after adding cover
+            displayMessage('ocrStatus', 'A white rectangle has been added. Position and resize it to cover unwanted text.', 'info');
+            document.getElementById('ocrCoverBtn').style.display = 'none';
+            currentEditorCanvasState = canvas.toJSON();
         }
 
         // --- Generate & Export Logic ---
@@ -634,23 +931,53 @@
                 displayMessage('exportError', 'Please upload a coupon template first.', 'danger');
                 return;
             }
+            if (!currentEditorCanvasState) {
+                displayMessage('exportError', 'Canvas state not ready. Please ensure template is loaded and objects are added.', 'danger');
+                return;
+            }
 
-            showLoading();
-            displayMessage('exportSuccess', '', 'success'); // Clear previous messages
+            showLoading('Generating coupons...');
+            displayMessage('exportSuccess', '', 'success');
             displayMessage('exportError', '', 'danger');
 
             const exportFormat = document.getElementById('exportFormat').value;
-            const expiryDate = document.getElementById('expiryDate').value || 'N/A';
+            const expiryDateInput = document.getElementById('expiryDate').value;
+            const dateFormat = document.getElementById('dateFormat').value;
+            let formattedExpiryDate = 'N/A';
+
+            if (expiryDateInput) {
+                const date = new Date(expiryDateInput);
+                if (!isNaN(date)) {
+                    const year = date.getFullYear();
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+
+                    switch (dateFormat) {
+                        case 'MM/DD/YYYY': formattedExpiryDate = `${month}/${day}/${year}`; break;
+                        case 'DD/MM/YYYY': formattedExpiryDate = `${day}/${month}/${year}`; break;
+                        case 'YYYY-MM-DD': formattedExpiryDate = `${year}-${month}-${day}`; break;
+                        case 'MM-DD-YYYY': formattedExpiryDate = `${month}-${day}-${year}`; break;
+                        case 'DD-MM-YYYY': formattedExpiryDate = `${day}-${month}-${year}`; break;
+                        default: formattedExpiryDate = `${month}/${day}/${year}`; // Default fallback
+                    }
+                }
+            }
+            
+            // Define a scaling factor for higher resolution export
+            const exportScaleFactor = 2; // Export at 2x resolution
+
+            const tempCanvas = new fabric.StaticCanvas(null, {
+                width: canvas.getWidth() * exportScaleFactor,
+                height: canvas.getHeight() * exportScaleFactor
+            });
+
             const doc = new jspdf.jsPDF({
-                orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                orientation: tempCanvas.width > tempCanvas.height ? 'landscape' : 'portrait',
                 unit: 'px',
-                format: [canvas.width, canvas.height]
+                format: [tempCanvas.width, tempCanvas.height]
             });
             let firstCouponGenerated = false;
-
-            // Save the current state of the canvas (with all placeholders and features)
-            const currentCanvasObjects = canvas.getObjects().filter(obj => obj.name !== 'background');
-            const background = canvas.backgroundImage;
+            let generatedCount = 0;
 
             for (const checkbox of selectedStudentCheckboxes) {
                 const studentId = checkbox.value;
@@ -661,66 +988,95 @@
                     continue;
                 }
 
-                // Reset canvas to original state (template + fixed elements)
-                canvas.clear();
-                canvas.setBackgroundImage(background, canvas.renderAll.bind(canvas));
-                canvas.loadFromJSON(originalCanvasState, function() {
-                    // Add back the dynamic objects from the current editor state
-                    currentCanvasObjects.forEach(obj => {
-                        const clonedObj = fabric.util.object.clone(obj);
-                        canvas.add(clonedObj);
-                    });
+                await new Promise(resolve => {
+                    tempCanvas.loadFromJSON(currentEditorCanvasState, () => {
+                        // Scale all objects on the temporary canvas
+                        tempCanvas.getObjects().forEach(obj => {
+                            obj.scaleX *= exportScaleFactor;
+                            obj.scaleY *= exportScaleFactor;
+                            obj.left *= exportScaleFactor;
+                            obj.top *= exportScaleFactor;
+                            if (obj.type === 'i-text' || obj.type === 'text') {
+                                obj.fontSize *= exportScaleFactor;
+                            }
+                            obj.set({ selectable: false, evented: false }); // Ensure objects are not interactive on temp canvas
+                        });
 
-                    // Replace placeholders with actual student data
-                    canvas.getObjects().forEach(obj => {
-                        if (obj.type === 'i-text' || obj.type === 'text') {
-                            let text = obj.text;
-                            text = text.replace('{STUDENT_NAME}', student.name || 'N/A');
-                            text = text.replace('{STUDENT_GRADE}', student.assignedGrade || 'N/A'); // Assuming assignedGrade exists
-                            text = text.replace('{EXPIRY_DATE}', expiryDate);
-                            obj.set({ text: text });
+                        // Rescale background image if present
+                        if (tempCanvas.backgroundImage) {
+                            tempCanvas.backgroundImage.scaleX *= exportScaleFactor;
+                            tempCanvas.backgroundImage.scaleY *= exportScaleFactor;
+                            tempCanvas.backgroundImage.left *= exportScaleFactor;
+                            tempCanvas.backgroundImage.top *= exportScaleFactor;
                         }
+
+                        tempCanvas.renderAll();
+
+                        // Replace placeholders with actual student data and expiry date
+                        tempCanvas.getObjects().forEach(obj => {
+                            if (obj.type === 'i-text' || obj.type === 'text') {
+                                let text = obj.text;
+                                text = text.replace('{STUDENT_NAME}', student.name || 'N/A');
+                                text = text.replace('{STUDENT_ID}', student.id || 'N/A'); // Added Student ID replacement
+                                text = text.replace('{STUDENT_GRADE}', student.assignedGrade || 'N/A');
+                                text = text.replace('{EXPIRY_DATE}', formattedExpiryDate);
+                                obj.set({ text: text });
+                            }
+                        });
+                        tempCanvas.renderAll();
+                        resolve();
                     });
-                    canvas.renderAll();
-
-                    // Generate image from canvas
-                    const dataURL = canvas.toDataURL({
-                        format: 'png',
-                        quality: 1
-                    });
-
-                    if (exportFormat === 'png') {
-                        const link = document.createElement('a');
-                        link.href = dataURL;
-                        link.download = `coupon_${student.name.replace(/\s/g, '_')}_${student.id}.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else if (exportFormat === 'pdf') {
-                        if (firstCouponGenerated) {
-                            doc.addPage();
-                        }
-                        doc.addImage(dataURL, 'PNG', 0, 0, canvas.width, canvas.height);
-                        firstCouponGenerated = true;
-                    }
-
-                    // Display preview of the last generated coupon
-                    if (checkbox === selectedStudentCheckboxes[selectedStudentCheckboxes.length - 1]) {
-                        const previewDiv = document.getElementById('lastCouponPreview');
-                        previewDiv.innerHTML = `<img src="${dataURL}" alt="Last Generated Coupon">`;
-                        document.getElementById('couponPreviewCard').style.display = 'block';
-                    }
                 });
+
+                const dataURL = tempCanvas.toDataURL({
+                    format: 'png',
+                    quality: 1 // Quality is already 1, but higher resolution helps
+                });
+
+                if (exportFormat === 'png') {
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = `coupon_${student.name.replace(/\s/g, '_')}_${student.id}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else if (exportFormat === 'pdf') {
+                    if (firstCouponGenerated) {
+                        doc.addPage();
+                    }
+                    doc.addImage(dataURL, 'PNG', 0, 0, tempCanvas.width, tempCanvas.height);
+                    firstCouponGenerated = true;
+                }
+
+                generatedCount++;
+                loadingText.textContent = `Generating coupons: ${generatedCount}/${selectedStudentCheckboxes.length}`;
+
+                // Update preview with the last generated coupon
+                if (checkbox === selectedStudentCheckboxes[selectedStudentCheckboxes.length - 1]) {
+                    const previewDiv = document.getElementById('lastCouponPreview');
+                    previewDiv.innerHTML = `<img src="${dataURL}" alt="Last Generated Coupon">`;
+                    document.getElementById('couponPreviewCard').style.display = 'block';
+                }
             }
 
             if (exportFormat === 'pdf' && firstCouponGenerated) {
                 doc.save('gurukul_coupons.pdf');
             }
 
-            displayMessage('exportSuccess', `Successfully generated and exported coupons for ${selectedStudentCheckboxes.length} students!`, 'success');
+            // Restore the main canvas to its editor state
+            await new Promise(resolve => {
+                canvas.loadFromJSON(currentEditorCanvasState, () => {
+                    canvas.getObjects().forEach(obj => {
+                        obj.set({ selectable: true, evented: true });
+                    });
+                    canvas.renderAll();
+                    resolve();
+                });
+            });
+
+            displayMessage('exportSuccess', `Successfully generated and exported coupons for ${generatedCount} students!`, 'success');
             hideLoading();
         }
-
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -736,6 +1092,12 @@
             });
 
             document.getElementById('templateUpload').addEventListener('change', loadTemplateImage);
+            document.getElementById('saveTemplateBtn').addEventListener('click', saveCanvasTemplate);
+            document.getElementById('loadTemplateBtn').addEventListener('click', () => {
+                document.getElementById('loadTemplateInput').click(); // Trigger hidden file input
+            });
+            document.getElementById('loadTemplateInput').addEventListener('change', loadCanvasTemplate);
+
 
             document.getElementById('addPlaceholderBtn').addEventListener('click', () => {
                 const type = document.getElementById('placeholderType').value;
@@ -744,7 +1106,7 @@
 
             document.querySelectorAll('.add-feature-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const feature = e.target.dataset.feature;
+                    const feature = e.currentTarget.dataset.feature;
                     addFeatureText(feature);
                 });
             });
