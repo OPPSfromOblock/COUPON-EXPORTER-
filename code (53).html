@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Gurukul Coupon Exporter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Tesseract.js (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #334a6d;
+            --success-color: #5cb85c;
+            --danger-color: #d9534f;
+            --warning-color: #f0ad4e;
+            --info-color: #5bc0de;
+            --light-bg: #f0f2f5;
+            --dark-bg: #2c3e50;
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            --gradient-start: #e0f2f7;
+            --gradient-end: #f0f8ff;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container-coupon-exporter {
+            max-width: 1200px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+        }
+
+        .btn {
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 20px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        .btn-success:hover {
+            background-color: #4cae4c;
+            border-color: #4cae4c;
+        }
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+        }
+        .btn-info:hover {
+            background-color: #46b8da;
+            border-color: #46b8da;
+        }
+
+        #couponCanvas {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: white;
+        }
+
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+        }
+        .list-group-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .list-group-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .generated-coupon-preview {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .generated-coupon-preview img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="container-coupon-exporter">
+        <h1><i class="fas fa-ticket-alt"></i> Gurukul Coupon Exporter</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-users"></i> Select Students
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="couponStudentSearch" placeholder="Search students...">
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <button class="btn btn-sm btn-outline-primary" id="selectAllStudentsBtn"><i class="fas fa-check-double"></i> Select All</button>
+                            <button class="btn btn-sm btn-outline-secondary" id="clearAllStudentsBtn"><i class="fas fa-times"></i> Clear All</button>
+                        </div>
+                        <div class="list-group" style="max-height: 300px; overflow-y: auto;" id="couponStudentList">
+                            <div class="text-center py-3" id="couponStudentLoading">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading students...</span>
+                                </div>
+                                Loading students...
+                            </div>
+                            <div class="alert alert-danger mt-3" style="display: none;" id="couponStudentError"></div>
+                            <!-- Student list will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-image"></i> Coupon Template
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="templateUpload" class="form-label">Upload PNG Template</label>
+                            <input class="form-control" type="file" id="templateUpload" accept="image/png">
+                        </div>
+                        <div class="alert alert-info" id="templateInfo" style="display: none;">
+                            Template loaded. Use the fields below to add dynamic text.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-edit"></i> Dynamic Fields & Features
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="placeholderType" class="form-label">Insert Placeholder</label>
+                            <select class="form-select" id="placeholderType">
+                                <option value="">Select a placeholder</option>
+                                <option value="name">Student Name</option>
+                                <option value="grade">Student Grade</option>
+                                <option value="expiry">Expiry Date</option>
+                            </select>
+                            <button class="btn btn-sm btn-primary mt-2" id="addPlaceholderBtn"><i class="fas fa-plus"></i> Add to Canvas</button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="expiryDate" class="form-label">Set Expiry Date</label>
+                            <input type="date" class="form-control" id="expiryDate">
+                        </div>
+
+                        <hr>
+                        <h5>Feature Checkboxes (Text on Canvas)</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="featureVision" value="Vision">
+                            <label class="form-check-label" for="featureVision">Vision</label>
+                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Vision"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="featureCanteen" value="Canteen">
+                            <label class="form-check-label" for="featureCanteen">Canteen</label>
+                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Canteen"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="featureVideoCall" value="Video Call">
+                            <label class="form-check-label" for="featureVideoCall">Video Call</label>
+                            <button class="btn btn-sm btn-outline-secondary ms-2 add-feature-btn" data-feature="Video Call"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+
+                        <hr>
+                        <h5>(Optional) OCR Cleanup</h5>
+                        <button class="btn btn-sm btn-info" id="ocrDetectBtn"><i class="fas fa-eye"></i> Detect Pre-written Text (OCR)</button>
+                        <button class="btn btn-sm btn-warning mt-2" id="ocrCoverBtn" style="display: none;"><i class="fas fa-eraser"></i> Cover Detected Area</button>
+                        <div class="alert alert-warning mt-2" id="ocrStatus" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-paint-brush"></i> Coupon Design Canvas
+                    </div>
+                    <div class="card-body text-center">
+                        <canvas id="couponCanvas"></canvas>
+                        <small class="text-muted mt-2 d-block">Drag and resize text fields on the canvas.</small>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-download"></i> Generate & Export
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="exportFormat" class="form-label">Export Format</label>
+                            <select class="form-select" id="exportFormat">
+                                <option value="png">PNG (Individual)</option>
+                                <option value="pdf">PDF (Combined)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success w-100" id="generateExportBtn"><i class="fas fa-file-export"></i> Generate & Export Coupons</button>
+                        <div class="alert alert-success mt-3" id="exportSuccess" style="display: none;"></div>
+                        <div class="alert alert-danger mt-3" id="exportError" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="card mt-4" id="couponPreviewCard" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-eye"></i> Last Generated Coupon Preview
+                    </div>
+                    <div class="card-body">
+                        <div class="generated-coupon-preview" id="lastCouponPreview">
+                            <!-- Last generated coupon image will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Firebase Configuration (Copy from your /code (52).html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsFiadkeL-__gF_Lb5VY2iap4DlatkaX4",
+            authDomain: "senior-data-researchinnovation.firebaseapp.com",
+            databaseURL: "https://senior-data-researchinnovation-default-rtdb.firebaseio.com",
+            projectId: "senior-data-researchinnovation",
+            storageBucket: "senior-data-researchinnovation.firebasestorage.app",
+            messagingSenderId: "587116206951",
+            appId: "1:587116206951:web:ddf6db02ecd19a63cf2dc2",
+            measurementId: "G-8E23BREM8V"
+        };
+
+        // Initialize Firebase
+        let firebaseApp;
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            console.log("Firebase initialized successfully in coupon_export.html");
+        } catch (err) {
+            console.error("Firebase initialization error in coupon_export.html:", err);
+            alert("Failed to connect to database. Please check your internet connection and try again.");
+        }
+        const database = firebase.database();
+
+        // Global variables
+        let students = [];
+        let canvas = null;
+        let templateImage = null;
+        let originalCanvasState = null; // To store the state after template and initial placeholders are added
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        function showLoading() { loadingOverlay.style.display = 'flex'; }
+        function hideLoading() { loadingOverlay.style.display = 'none'; }
+
+        function displayMessage(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.className = `alert alert-${type} mt-3`;
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => { element.style.display = 'none'; }, 5000);
+            }
+        }
+
+        // --- Student Selector Logic ---
+        async function loadStudentsFromFirebase() {
+            showLoading();
+            const listContainer = document.getElementById('couponStudentList');
+            const loadingDiv = document.getElementById('couponStudentLoading');
+            const errorDiv = document.getElementById('couponStudentError');
+
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            listContainer.innerHTML = '';
+
+            try {
+                const snapshot = await database.ref('students').once('value');
+                if (!snapshot.exists()) {
+                    errorDiv.textContent = "No student data available in Firebase.";
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                const data = snapshot.val();
+                students = Array.isArray(data) ? data : Object.values(data);
+
+                // Sort students alphabetically by name
+                const sortedStudents = [...students].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+                sortedStudents.forEach(student => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item';
+                    item.innerHTML = `
+                        <input class="form-check-input me-1" type="checkbox" value="${student.id}" id="coupon_student_${student.id}">
+                        <label class="form-check-label stretched-link" for="coupon_student_${student.id}">
+                            ${student.name} (ID: ${student.id})
+                        </label>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            } catch (e) {
+                console.error('Error loading students for coupon export:', e);
+                errorDiv.textContent = 'An error occurred while loading students: ' + e.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+                hideLoading();
+            }
+        }
+
+        function filterCouponStudents() {
+            const query = document.getElementById('couponStudentSearch').value.toLowerCase();
+            const items = document.querySelectorAll('#couponStudentList .list-group-item');
+            items.forEach(item => {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                item.style.display = label.includes(query) ? '' : 'none';
+            });
+        }
+
+        // --- Canvas and Fabric.js Logic ---
+        function initCanvas() {
+            canvas = new fabric.Canvas('couponCanvas', {
+                backgroundColor: '#f9f9f9',
+                selection: true, // Enable selection of objects
+                preserveObjectStacking: true // Keep objects in their z-index order
+            });
+
+            // Set initial dimensions (can be adjusted based on common template sizes)
+            canvas.setDimensions({ width: 600, height: 300 });
+
+            // Event listener for object selection
+            canvas.on('selection:created', function(e) {
+                if (e.target) {
+                    console.log('Object selected:', e.target);
+                }
+            });
+            canvas.on('selection:updated', function(e) {
+                if (e.target) {
+                    console.log('Object selected:', e.target);
+                }
+            });
+        }
+
+        function loadTemplateImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgUrl = e.target.result;
+                fabric.Image.fromURL(imgUrl, function(img) {
+                    templateImage = img;
+                    // Scale image to fit canvas width, maintaining aspect ratio
+                    img.scaleToWidth(canvas.getWidth());
+                    canvas.setHeight(img.getScaledHeight()); // Adjust canvas height to image height
+
+                    canvas.clear(); // Clear previous content
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                    canvas.renderAll();
+
+                    document.getElementById('templateInfo').style.display = 'block';
+                    originalCanvasState = canvas.toJSON(); // Save initial state
+                }, { crossOrigin: 'anonymous' }); // Important for toDataURL later
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addPlaceholder(type) {
+            if (!canvas || !templateImage) {
+                displayMessage('exportError', 'Please upload a coupon template first.', 'danger');
+                return;
+            }
+
+            let text = '';
+            let fontSize = 20;
+            let fontWeight = 'normal';
+            let fill = '#000000'; // Default text color
+
+            switch (type) {
+                case 'name':
+                    text = '{STUDENT_NAME}';
+                    fontSize = 24;
+                    fontWeight = 'bold';
+                    fill = '#00008B'; // Dark Blue
+                    break;
+                case 'grade':
+                    text = '{STUDENT_GRADE}';
+                    fontSize = 22;
+                    fontWeight = 'bold';
+                    fill = '#228B22'; // Forest Green
+                    break;
+                case 'expiry':
+                    text = '{EXPIRY_DATE}';
+                    fontSize = 18;
+                    fill = '#8B0000'; // Dark Red
+                    break;
+                default:
+                    return;
+            }
+
+            const textObject = new fabric.IText(text, {
+                left: 50,
+                top: 50,
+                fontFamily: 'Poppins',
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                fill: fill,
+                hasControls: true, // Allow resizing and rotating
+                hasBorders: true,
+                selectable: true,
+                name: type // Custom property to identify placeholder type
+            });
+            canvas.add(textObject);
+            canvas.setActiveObject(textObject); // Select the newly added object
+            canvas.renderAll();
+        }
+
+        function addFeatureText(feature) {
+            if (!canvas || !templateImage) {
+                displayMessage('exportError', 'Please upload a coupon template first.', 'danger');
+                return;
+            }
+
+            const textObject = new fabric.IText(feature, {
+                left: 50,
+                top: 100 + (canvas.getObjects().length * 10), // Offset to avoid overlapping
+                fontFamily: 'Poppins',
+                fontSize: 16,
+                fill: '#333333',
+                hasControls: true,
+                hasBorders: true,
+                selectable: true,
+                name: `feature_${feature.replace(/\s/g, '')}` // Unique name for feature text
+            });
+            canvas.add(textObject);
+            canvas.setActiveObject(textObject);
+            canvas.renderAll();
+        }
+
+        // --- OCR Cleanup (Optional) ---
+        async function detectTextWithOCR() {
+            if (!canvas || !templateImage) {
+                displayMessage('ocrStatus', 'Please upload a coupon template first.', 'danger');
+                return;
+            }
+            displayMessage('ocrStatus', 'Detecting text with OCR... This may take a moment.', 'info');
+            showLoading();
+
+            try {
+                // Get the image data from the canvas
+                const imageDataUrl = canvas.toDataURL({
+                    format: 'png',
+                    quality: 1
+                });
+
+                const { data: { text, words } } = await Tesseract.recognize(
+                    imageDataUrl,
+                    'eng', // English language
+                    {
+                        logger: m => console.log(m) // Log progress
+                    }
+                );
+
+                console.log('OCR Result:', text);
+                console.log('Detected Words:', words);
+
+                if (words && words.length > 0) {
+                    displayMessage('ocrStatus', `OCR detected text: "${text.substring(0, 50)}..."`, 'success');
+                    document.getElementById('ocrCoverBtn').style.display = 'inline-block';
+
+                    // Add bounding boxes for detected words (optional, for visualization)
+                    words.forEach(word => {
+                        const rect = new fabric.Rect({
+                            left: word.bbox.x,
+                            top: word.bbox.y,
+                            width: word.bbox.width,
+                            height: word.bbox.height,
+                            fill: 'rgba(255,0,0,0.2)', // Semi-transparent red
+                            stroke: 'red',
+                            strokeWidth: 1,
+                            selectable: false,
+                            evented: false,
+                            name: 'ocr_bbox'
+                        });
+                        canvas.add(rect);
+                    });
+                    canvas.renderAll();
+                } else {
+                    displayMessage('ocrStatus', 'No text detected by OCR.', 'warning');
+                    document.getElementById('ocrCoverBtn').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('OCR Error:', error);
+                displayMessage('ocrStatus', 'Error during OCR detection: ' + error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function coverDetectedArea() {
+            // Remove existing OCR bounding boxes
+            canvas.remove(...canvas.getObjects().filter(obj => obj.name === 'ocr_bbox'));
+
+            // For simplicity, this function will just add a white rectangle.
+            // In a real scenario, you'd use the OCR bounding boxes to create specific cover rectangles.
+            // Or, if you want to cover a specific "name" area, you'd define its coordinates.
+            const coverRect = new fabric.Rect({
+                left: 10, // Example coordinates, adjust as needed
+                top: 10,
+                width: 200,
+                height: 50,
+                fill: 'white', // Or the background color of your template
+                selectable: true,
+                hasControls: true,
+                name: 'ocr_cover_area'
+            });
+            canvas.add(coverRect);
+            canvas.renderAll();
+            displayMessage('ocrStatus', 'A white rectangle has been added. Position it to cover unwanted text.', 'info');
+            document.getElementById('ocrCoverBtn').style.display = 'none'; // Hide after adding cover
+        }
+
+        // --- Generate & Export Logic ---
+        async function generateAndExportCoupons() {
+            const selectedStudentCheckboxes = document.querySelectorAll('#couponStudentList input[type="checkbox"]:checked');
+            if (selectedStudentCheckboxes.length === 0) {
+                displayMessage('exportError', 'Please select at least one student.', 'danger');
+                return;
+            }
+            if (!canvas || !templateImage) {
+                displayMessage('exportError', 'Please upload a coupon template first.', 'danger');
+                return;
+            }
+
+            showLoading();
+            displayMessage('exportSuccess', '', 'success'); // Clear previous messages
+            displayMessage('exportError', '', 'danger');
+
+            const exportFormat = document.getElementById('exportFormat').value;
+            const expiryDate = document.getElementById('expiryDate').value || 'N/A';
+            const doc = new jspdf.jsPDF({
+                orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+            let firstCouponGenerated = false;
+
+            // Save the current state of the canvas (with all placeholders and features)
+            const currentCanvasObjects = canvas.getObjects().filter(obj => obj.name !== 'background');
+            const background = canvas.backgroundImage;
+
+            for (const checkbox of selectedStudentCheckboxes) {
+                const studentId = checkbox.value;
+                const student = students.find(s => s.id === studentId);
+
+                if (!student) {
+                    console.warn(`Student with ID ${studentId} not found. Skipping.`);
+                    continue;
+                }
+
+                // Reset canvas to original state (template + fixed elements)
+                canvas.clear();
+                canvas.setBackgroundImage(background, canvas.renderAll.bind(canvas));
+                canvas.loadFromJSON(originalCanvasState, function() {
+                    // Add back the dynamic objects from the current editor state
+                    currentCanvasObjects.forEach(obj => {
+                        const clonedObj = fabric.util.object.clone(obj);
+                        canvas.add(clonedObj);
+                    });
+
+                    // Replace placeholders with actual student data
+                    canvas.getObjects().forEach(obj => {
+                        if (obj.type === 'i-text' || obj.type === 'text') {
+                            let text = obj.text;
+                            text = text.replace('{STUDENT_NAME}', student.name || 'N/A');
+                            text = text.replace('{STUDENT_GRADE}', student.assignedGrade || 'N/A'); // Assuming assignedGrade exists
+                            text = text.replace('{EXPIRY_DATE}', expiryDate);
+                            obj.set({ text: text });
+                        }
+                    });
+                    canvas.renderAll();
+
+                    // Generate image from canvas
+                    const dataURL = canvas.toDataURL({
+                        format: 'png',
+                        quality: 1
+                    });
+
+                    if (exportFormat === 'png') {
+                        const link = document.createElement('a');
+                        link.href = dataURL;
+                        link.download = `coupon_${student.name.replace(/\s/g, '_')}_${student.id}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else if (exportFormat === 'pdf') {
+                        if (firstCouponGenerated) {
+                            doc.addPage();
+                        }
+                        doc.addImage(dataURL, 'PNG', 0, 0, canvas.width, canvas.height);
+                        firstCouponGenerated = true;
+                    }
+
+                    // Display preview of the last generated coupon
+                    if (checkbox === selectedStudentCheckboxes[selectedStudentCheckboxes.length - 1]) {
+                        const previewDiv = document.getElementById('lastCouponPreview');
+                        previewDiv.innerHTML = `<img src="${dataURL}" alt="Last Generated Coupon">`;
+                        document.getElementById('couponPreviewCard').style.display = 'block';
+                    }
+                });
+            }
+
+            if (exportFormat === 'pdf' && firstCouponGenerated) {
+                doc.save('gurukul_coupons.pdf');
+            }
+
+            displayMessage('exportSuccess', `Successfully generated and exported coupons for ${selectedStudentCheckboxes.length} students!`, 'success');
+            hideLoading();
+        }
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initCanvas();
+            loadStudentsFromFirebase();
+
+            document.getElementById('couponStudentSearch').addEventListener('input', filterCouponStudents);
+            document.getElementById('selectAllStudentsBtn').addEventListener('click', () => {
+                document.querySelectorAll('#couponStudentList input[type="checkbox"]').forEach(cb => cb.checked = true);
+            });
+            document.getElementById('clearAllStudentsBtn').addEventListener('click', () => {
+                document.querySelectorAll('#couponStudentList input[type="checkbox"]').forEach(cb => cb.checked = false);
+            });
+
+            document.getElementById('templateUpload').addEventListener('change', loadTemplateImage);
+
+            document.getElementById('addPlaceholderBtn').addEventListener('click', () => {
+                const type = document.getElementById('placeholderType').value;
+                if (type) addPlaceholder(type);
+            });
+
+            document.querySelectorAll('.add-feature-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const feature = e.target.dataset.feature;
+                    addFeatureText(feature);
+                });
+            });
+
+            document.getElementById('ocrDetectBtn').addEventListener('click', detectTextWithOCR);
+            document.getElementById('ocrCoverBtn').addEventListener('click', coverDetectedArea);
+
+            document.getElementById('generateExportBtn').addEventListener('click', generateAndExportCoupons);
+        });
+    </script>
+</body>
+</html>
